@@ -18,7 +18,7 @@ const int RELAYPIN = D16;
 //LOADCELL
 HX711 myScale (D6,D7);
 
-const int CALFACTOR = 4;
+const int CALFACTOR = 1000;
 const int SAMPLES=10;
 float weight, rawData, calibration;
 int offset;
@@ -28,8 +28,8 @@ int grams;
 int currentTime; 
 int lastTime;
  
-Timer pumpWaitTimer;
-Timer pumpTimer;
+IoTTimer pumpWaitTimer;
+IoTTimer pumpTimer;
 
 
 
@@ -48,41 +48,45 @@ pinMode(RELAYPIN, OUTPUT);
 //LOADCELL
 myScale.set_scale();
   delay (5000);
-  myScale.tare();
+  myScale.tare(0); // set the tare weight or leave at zero
   myScale.set_scale(CALFACTOR);
 
 }
 
 
 void loop() {
-currentTime = millis();
+//currentTime = millis();
 
-//LOADCELL TIMER
+//LOADCELL 
+  weight = myScale.get_units(SAMPLES);
+  offset = myScale.get_offset();//returns the offset by tare();
+  Serial.printf ("The weight is %f \n", weight);
+  delay(5000);
 
-
-if (pumpWaitTimer.isTimerReady()) {
-  if (weight >= 244) {
-    weight = myScale.get_units(SAMPLES);
-    Serial.printf ("The weight is %f \n", weight);
-    delay(5000);
-    pumpTimer.startTimer (5000);
-    digitalWrite(RELAYPIN, HIGH);
-  }
-  if(pumpTimer.isTimerReady()) {
-    digitalWrite (RELAYPIN, LOW);
-  }
-  
-}
-//if (weight > 244 || weight < 800) {
-//if (weight > 244) {
+// if (weight >= 200) {
 //   digitalWrite (RELAYPIN,HIGH);
+//   Serial.printf ("fill cup \n");
 // }
-// else {
+// if  (weight <= 244 ) {
 //   digitalWrite (RELAYPIN, LOW);
-  
+// }
+}
+
+//TIMER
+// if (pumpWaitTimer.isTimerReady()) {
+//   if (weight >= 244) {
+//     weight = myScale.get_units(SAMPLES);
+//     Serial.printf ("The weight is %f \n", weight);
+//     delay(5000);
+//     pumpTimer.startTimer (5000);
+//     digitalWrite(RELAYPIN, HIGH);
+//   }
+//   if(pumpTimer.isTimerReady()) {
+//     digitalWrite (RELAYPIN, LOW);
+//   }
 // }
 
-
+//if (weight > 244 || weight < 800) {
 /* //Chaeck if RELAY is working
 digitalWrite (RELAYPIN,HIGH);
 delay (10000);
@@ -90,4 +94,4 @@ digitalWrite(RELAYPIN,LOW);
 delay (10000);
 */
 
-}
+

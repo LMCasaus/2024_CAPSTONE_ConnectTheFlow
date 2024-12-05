@@ -12,7 +12,7 @@
 
 HX711 myScale (D6,D7);
 
-const int CALFACTOR = 4;
+const int CALFACTOR = 1000;
 const int SAMPLES=10;
 
 float weight, rawData, calibration;
@@ -31,12 +31,13 @@ void setup() {
 
   myScale.set_scale();
   delay (5000);
-  myScale.tare();
+  myScale.tare(0); // set the tare weight or leave at zero
   myScale.set_scale(CALFACTOR);
 }
 
 void loop() {
   weight = myScale.get_units(SAMPLES);
+  offset = myScale.get_offset();//returns the offset by tare();
   delay(5000);
   Serial.printf ("The weight is %f \n", weight);
 }
