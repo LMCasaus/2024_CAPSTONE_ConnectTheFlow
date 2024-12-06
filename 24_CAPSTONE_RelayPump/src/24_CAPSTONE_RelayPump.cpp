@@ -29,12 +29,11 @@ pinMode(RELAYPIN, OUTPUT);
 
 void loop() {
 
-
-/* //Chaeck if RELAY is working
+//Check if RELAY is working
 digitalWrite (RELAYPIN,HIGH);
 delay (10000);
 digitalWrite(RELAYPIN,LOW);
 delay (10000);
-*/
+
 
 }
