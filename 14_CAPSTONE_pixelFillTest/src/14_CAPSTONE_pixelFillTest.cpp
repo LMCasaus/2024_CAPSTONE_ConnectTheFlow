@@ -11,7 +11,7 @@
 #include "neopixel.h"
 #include "Colors.h"
 
-const int PIXELCOUNT = 30; //total number of neopixelsconsy
+const int PIXELCOUNT = 60; //total number of neopixelsconsy
 const int OFFSET = 16;
 
 
@@ -73,6 +73,13 @@ pixelFill (1, 10,  teal);
 //PRESS ME
 pixelFill (11, 11, white);
 
+pixelFill (12, 20,  teal);
+
+pixelFill (21, 21, white);
+
+pixelFill (22, 27,  teal);
+
+
 //PIEZO GB
 maxValue = 0;
 //this loop is finding the max value
@@ -97,8 +104,9 @@ pixelNum = ((PIXELCOUNT/4095.0) * maxValue); // AVOIDING DIVIDING AN INT BY AN I
   }
 
 //PRESS ME
-pixelFill( 29, 29, white);
+pixelFill( 59, 59, white);
 pixel.show();
+delay (5000);
 }
 
 //void --- isthe definition of a function 
