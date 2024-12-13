@@ -11,8 +11,34 @@
 #include "neopixel.h"
 #include "Colors.h"
 
+#include "Adafruit_GFX.h"
+#include "Adafruit_SSD1306.h"
+
+#include "Stepper.h"
+
+//STEPPER
+Stepper myStepper (2048,D4, D6, D5, D7);
+int speed = 3;
+int steps;
+
+
+//OLED
+const int OLED_RESET =-1;
+Adafruit_SSD1306 display (OLED_RESET);
+#define NUMFLAKES 10
+#define XPOS 0
+#define YPOS 1
+#define DELTAY 2
+
+#if (SSD1306_LCDHEIGHT != 64)
+#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
+
+
+
 const int PIXELCOUNT = 60; //total number of neopixelsconsy
 const int OFFSET = 16;
+const int stepperTrigger = 58;
 
 
 //NEOPIXELS
@@ -29,13 +55,6 @@ const float measurement =.0008;
 float bitsToVolts (int measurement);
 int maxValue;
 int pixelNum;
-
-//PIXEL ANIMATIONS
-// int segment;
-// int waterStart;
-// int waterFlow ;
-// int pressMe;
-// int dropMe;
 
 
 void pixelFill( int startPixel , int endPixel  , int color );
@@ -58,6 +77,21 @@ void setup() {
   pixel.begin();
   pixel.setBrightness(bri);//value is 0-255
   pixel.show();
+
+   //OLED
+//initialize the screen, hexnumber 0x3C is 60 in decimal
+  display.begin(SSD1306_SWITCHCAPVCC,0x3C); 
+  display.setTextSize (1);
+  display.setTextColor (WHITE);
+  display.setCursor(0,0);
+  display.printf("Hello, Its Hot. Please give me some water!\n");
+  delay (2000);
+  display.display(); 
+  display.clearDisplay();
+
+  //MOTOR
+  myStepper.setSpeed(speed);///speed is an integer specifying RPm 
+
   
 }
 
@@ -70,7 +104,7 @@ pixelFill (0, 0, white);
 //WATER FLOW
 pixelFill (1, 10,  teal);
 
-//PRESS ME
+//Auto -- Ideally, this will turn on when a person is within 20 cm using the Motion Sensor
 pixelFill (11, 11, white);
 
 pixelFill (12, 20,  teal);
@@ -79,8 +113,24 @@ pixelFill (21, 21, white);
 
 pixelFill (22, 27,  teal);
 
+pixelFill (28,28, white);
 
-//PIEZO GB
+//PRESS ME
+
+display.setTextSize (1);
+display.setCursor(0,0);
+display.printf("Thank you for the water. Please press over THERE to fill the lights\n");
+display.display(); 
+display.clearDisplay();
+
+
+pixelFill (35, 35, white);
+
+pixelFill (41, 41, white);
+
+pixelFill (59, 59, white);
+
+//PIEZO GBP
 maxValue = 0;
 //this loop is finding the max value
  for (i = 0; i<100; i++) {
@@ -90,7 +140,7 @@ maxValue = 0;
     maxValue = bits;
   }
  }
-pixelNum = ((PIXELCOUNT/4095.0) * maxValue); // AVOIDING DIVIDING AN INT BY AN INT
+pixelNum = ((PIXELCOUNT/4095.0) * maxValue); // AVOIDING DIVIDING AN INT BY AN INT - thank you EJ
   //this loop is lighting the pixels
   if (maxValue>1000){
     for (i=12; i<pixelNum; i++) {
@@ -101,12 +151,39 @@ pixelNum = ((PIXELCOUNT/4095.0) * maxValue); // AVOIDING DIVIDING AN INT BY AN I
 
    	pixel.show();
     pixel.clear ();
+
+
+//INITIALIZE STEPPER
+if (stepperTrigger >= 58) {
+  display.setTextSize (1);
+  display.setCursor(0,0);
+  display.printf("Success! Please wait for your prize.\n");
+  display.display(); 
+  display.clearDisplay();
+
+  myStepper.step(-3000);//steps is a signed integer indicating how many steps to move
+  delay (50);//myStepper.step(-1000);
   }
 
-//PRESS ME
+else {
+  display.setTextSize (1);
+  display.setCursor(0,0);
+  display.printf("Sorry, please try again.\n");
+  display.display(); 
+  display.clearDisplay();
+//was not sure about how to stop the motor and how to calculate the time needed for the item to drop.
+  //myStepper.step ();//steps is a signed integer indicating how many steps to move
+}
+
+
+
+  }
+
+// //PRESS ME
 pixelFill( 59, 59, white);
 pixel.show();
 delay (5000);
+
 }
 
 //void --- isthe definition of a function 
@@ -123,22 +200,3 @@ float bitsToVolts (int measurement) {
   return answer;
 }
 
-
-// void pixelFill( int startPixel , int endPixel  , int color ){
-  
-//   for(int iUp=startPixel; iUp<=endPixel; iUp++){
-//     pixel.setPixelColor (iUp,color);
-//     }
-// pixel.show();
-//  }
-
-
-//LOOP
- //down
-      // for (k_down =10; k_down >1; k_down--){
-      //   pixel.setPixelColor(k_down, blue);
-      //   pixel.show();
-      //   delay(50);
-      //   pixel.clear();//pixel.clear(); where you show you clear has an effect on when or where your pixels light up
-      //   pixel.show();//pixel.show();
-       // }
