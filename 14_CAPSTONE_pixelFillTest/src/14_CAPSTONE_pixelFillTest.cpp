@@ -179,10 +179,10 @@ else {
 
   }
 
-// //PRESS ME
-pixelFill( 59, 59, white);
-pixel.show();
-delay (5000);
+// // //PRESS ME
+// pixelFill( 59, 59, white);
+// pixel.show();
+// delay (5000);
 
 }
 
